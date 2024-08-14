@@ -1,0 +1,101 @@
+[
+  {
+    "step": "Step1",
+    "name_kk": "шаг1",
+    "name_ru": "шаг1",
+    "fields": {
+      "statusOpor": {
+        "type": "boolean",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное statusOpor"
+      },
+      "statusSput": {
+        "type": "boolean",
+        "requirement": "yes",
+        "name_kk": "спутник",
+        "name_ru": "спутник statusSput"
+      },
+      "statusProch": {
+        "type": "string",
+        "requirement": "yes",
+        "name_kk": "спутник",
+        "name_ru": "спутник statusProch"
+      },
+      "statusPrigran": {
+        "type": "boolean",
+        "requirement": "yes",
+        "name_kk": "спутник",
+        "name_ru": "спутник statusPrigran"
+      },
+      "obshKolSelNasPun": {
+        "type": "int",
+        "requirement": "yes",
+        "name_kk": "спутник",
+        "name_ru": "спутник obshKolSelNasPun"
+      },
+      "obshKolChelNasPun": {
+        "type": "double",
+        "requirement": "yes",
+        "name_kk": "спутник",
+        "name_ru": "спутник obshKolChelNasPun"
+      },
+      "obshKolDomHoz": {
+        "type": "int",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное obshKolDomHoz"
+      },
+      "yearSystVodoSnab": {
+        "type": "string",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное yearSystVodoSnab"
+      }
+    }
+  },
+  {
+    "step": "Step2",
+    "name_kk": "шаг2",
+    "name_ru": "шаг2",
+    "fields": {
+      "dosVodoSnabKolChel": {
+        "type": "guid-string",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное dosVodoSnabKolChel"
+      },
+      "dosVodoSnabPercent": {
+        "type": "int",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное dosVodoSnabPercent"
+      }
+    }
+  },
+  {
+    "step": "Step3",
+    "name_kk": "шаг3",
+    "name_ru": "шаг3",
+    "fields": {
+      "centrVodoSnabYriLic": {
+        "type": "int",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное centrVodoSnabYriLic"
+      },
+      "centrVodoSnabBudzhOrg": {
+        "type": "int",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное centrVodoSnabBudzhOrg"
+      },
+      "centrVodoIndivPriborUchVodyVsego": {
+        "type": "datetime",
+        "requirement": "no",
+        "name_kk": "опорное",
+        "name_ru": "опорное centrVodoIndivPriborUchVodyVsego"
+      }
+    }
+  }
+]
