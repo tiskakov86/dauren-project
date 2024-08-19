@@ -1,21 +1,26 @@
 <template>
     <div>
-      <div v-for="(semEl, semIndx) of semData" :key="`semIndx_${semIndx}`">
+      <div v-for="(formEl, formIndx) of formData" :key="`formIndx${formIndx}`">
         <div class="button-with-text">
-          <b-button @click="semEl.isExpanded=!semEl.isExpanded" class="circle-button">
-            <i :class="!semEl.isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="icon-color"></i>
+          <b-button @click="formEl.isExpanded=!formEl.isExpanded" class="circle-button">
+            <i :class="!formEl.isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="icon-color"></i>
           </b-button>
-          <span class="button-text">{{ semEl.obslPredpId }}</span>
+          <!-- <span class="button-text">{{ formEl.obslPredpId }}</span> -->
+          <span class="button-text">{{ formEl.id }}</span>
         </div>
-        <b-collapse v-model="semEl.isExpanded">
+        <b-collapse v-model="formEl.isExpanded">
           <b-card>
-            <table v-if="semEl.fields">
-              <tr v-for="([key, value], indxField) in Object.entries(semEl.fields)" :key="`semIndx_${semIndx}_indxField_${indxField}_${key}`">
+            <table v-if="formEl.fields">
+              <tr v-for="([key, value], indxField) in Object.entries(formEl.fields)" :key="`formIndx${formIndx}_indxField_${indxField}_${key}`">
                 <td style="padding-right: 10px;">{{ value.name_ru }}</td>
                 <td>
-                  <b-form-checkbox v-if="value.type=='boolean'" v-model="value.val"></b-form-checkbox>
+                  <b-form-checkbox v-if="value.type=='boolean'" v-model="value.val" :disabled="!edited" @change="changeData(formIndx, key, value)"></b-form-checkbox>
                   <template v-else>
-                    <b-input type="text" style="margin-top: 10px;" v-model="value.val"></b-input>
+                    <template v-if="value.type=='double' || value.type=='int'">
+                      <c-number-input  style="margin-top: 10px;" v-model="value.val" :disabled="!edited" @change.native="changeData(formIndx, key, value)"/>
+                    </template>
+                    <b-input v-else-if="value.type=='string'" type="text" style="margin-top: 10px;" v-model="value.val" :disabled="!edited" @change="changeData(formIndx, key, value)"></b-input>
+                    <template v-else>Тип не определён</template>
                   </template>
                 </td>
               </tr>
@@ -63,9 +68,13 @@
    
   <script lang="ts">
   import { Component, Vue, Prop } from 'vue-property-decorator';
+  import CNumberInput from '@/components/cNumberInput.vue';
   
   @Component({
-    name: 'c-step'
+    name: 'c-step',
+    components: {
+      'c-number-input': CNumberInput
+    }
   })
   export default class CStep extends Vue {
     @Prop({
@@ -74,7 +83,13 @@
     })
     private stepFrame!: any;
 
-    private semData: any[] = []; // список сэм (для редактирования)
+    @Prop({
+        required: true,
+        default: false
+    })
+    private edited!: boolean;
+
+    private formData: any[] = []; // список форм (для редактирования)
 
     @Prop({
         required: true,
@@ -85,24 +100,35 @@
     private inputArr = [1, 2, 3, 4, 5, 6];
 
     private mounted() {
-      this.getSem();
+      this.getForm();
       this.$watch('documentData', () => {
-        this.getSem();
+        this.getForm();
       })
     }
 
-    private getSem() {
-      this.semData = [];
+    private getForm() {
+      this.formData = [];
       if (this.documentData === null) { return; }
+      console.log('stepFrame', JSON.parse(JSON.stringify(this.stepFrame)));
+      console.log('documentData', JSON.parse(JSON.stringify(this.documentData)));
       for (const elDoc of this.documentData) {
         const obj: any = {};
         for (const fieldKey in this.stepFrame.fields) {
           obj[fieldKey] = { ...this.stepFrame.fields[fieldKey]};
           obj[fieldKey].val = fieldKey in elDoc ? elDoc[fieldKey] : null;
         }
-        this.semData.push({obslPredpId: elDoc.obslPredpId, fields: obj, isExpanded: false });
+        this.formData.push({obslPredpId: elDoc.obslPredpId, fields: obj, isExpanded: true, id: elDoc.id });
       }
-      console.log('semData', this.semData);
+      console.log('formData', this.formData);
+    }
+
+    private changeData(formIndx: number, key: string, value: any) {
+      console.log('changeData called with:', { formIndx, key, value });
+      if (!value || !value.hasOwnProperty('val')) {
+        console.log('Invalid value object:', value);
+        return;
+      }
+      this.$emit('change', {formIndx: formIndx, key: key, value: value});
     }
 }
   </script>

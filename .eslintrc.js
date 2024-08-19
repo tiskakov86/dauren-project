@@ -32,6 +32,7 @@ module.exports = {
         'space-before-blocks': 'off',
         'object-curly-spacing': 'off',
         'space-infix-ops': 'off',
+        'vue/multi-word-component-names': 'off',
 
         // Possible Errors
         'for-direction': tempWarn,
