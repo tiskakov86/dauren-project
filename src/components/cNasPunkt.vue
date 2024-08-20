@@ -5,10 +5,12 @@
         <div class="left-content" style="margin-left: 10px;">
           <!-- <div class="d-inline-block p-2"><b-form-input type="number" min="1990" max="2000" style="width: 200px;" v-model="curYear"/></div> -->
           <div class="d-inline-block p-2">
-            <label v-if="!curKato" style="cursor: pointer; font-weight: bold;" @click="selectKatoClk">Выбрать регион</label>
-            <label v-else style="cursor: pointer; font-weight: bold;" @click="selectKatoClk">{{ `${curKato.code} - ${curKato.name}`}}</label>
+            <b-button @click="selectKatoClk">
+              <template v-if="!curKato">Выбрать регион</template>
+              <template v-else>{{ `${curKato.code} - ${curKato.name}`}}</template>
+            </b-button>
           </div>
-          <div class="d-inline-block p-2">
+          <!--<div class="d-inline-block p-2">
             <multiselect
                   v-model="curDocument"
                   track-by="id"
@@ -20,16 +22,23 @@
                   :show-labels="false"
               >
               </multiselect>
-            </div>
+            </div> -->
             <!-- <div class="d-inline-block p-2">
               <b-button class="btn-button" variant="success" @click="loadDocument" :disabled="!curDocument">Открыть документ</b-button>
             </div> -->
+            
             <div class="d-inline-block p-2">
-              <b-form-checkbox v-model="editMode" switch :disabled="!(curDocument && stepLst && stepLst.length)">Редактировать</b-form-checkbox>
+              <b-button class="btn-button" variant="success" @click="addDocClk" :disabled="!curKato">Создать документ <span v-if="isVillage"> по селу</span><span v-else> по городу</span></b-button>
             </div>
-            <div class="d-inline-block p-2">
-              <b-button class="btn-button" variant="success" @click="addDocClk" :disabled="!curKato">Создать доумент</b-button>
+            
+            <b-form-select value-field="id" text-field="name"  v-model="curDocId" :options="documentLst" :select-size="4" :disabled="!saveDisabled"></b-form-select>
+            <div>
+              <div class="d-inline-block p-2 mt-3" v-if="curDocument"><strong>Документ за  {{ curDocument.name }}</strong></div>
+              <div class="d-inline-block p-2" v-if="curDocument">
+                <b-form-checkbox v-model="editMode" switch :disabled="!(curDocument && stepLst && stepLst.length)">Редактировать</b-form-checkbox>
+              </div>
             </div>
+              
             <div v-if="curDocument && stepLst && stepLst.length && editMode">
               <div class="d-inline-block p-2">
                 <b-button class="btn-button" variant="success" @click="saveDataClk" :disabled="saveDisabled">Сохранить</b-button>
@@ -38,7 +47,7 @@
                 <b-button class="btn-button" variant="light" @click="cancelSaveClk" v-if="!saveDisabled">Отменить</b-button>
               </div>
               <div class="d-inline-block p-2">
-                <b-button class="btn-button" variant="success" @click="addForm" :disabled="!saveDisabled">Создать форму</b-button>
+                <b-button class="btn-button" variant="success" @click="addForm" :disabled="!saveDisabled">Добавить данные (строку)</b-button>
               </div>
             </div>
         </div>
@@ -51,8 +60,8 @@
         </b-tabs>
       </b-card>
       <!----------------------->
-      <c-kato-modal ref="refKatoModal" @selectKato="selectKato"/>
-      <c-create-doc-modal ref="refCreateDocModal" :disabled="!token" :curKato="curKato" :login="login" :token="token" @created="docCreated"/>
+      <c-kato-modal :isVillage ="isVillage" ref="refKatoModal" @selectKato="selectKato"/>
+      <c-create-doc-modal ref="refCreateDocModal" :isVillage ="isVillage" :disabled="!token" :curKato="curKato" :login="login" :token="token" @created="docCreated"/>
       <!----------------------->
       <b-modal id="confirmModal" title="Confirm" @ok="confirmSaveChange" @cancel="cancelSaveChange" v-model="showSaveModal" no-close-on-backdrop no-close-on-esc hide-header>
         <p>Есть изменения! Сохранить?</p>
@@ -61,11 +70,12 @@
   </template>
   
   <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component, Vue, Prop } from 'vue-property-decorator';
   import CStep from '@/components/cStep.vue';
   import CKatoModal from '@/components/cKatoModal.vue';
   import CCreateDocModal from '@/components/cCreateDocModal.vue';
   import stepFieldsSeloFrame from '@/assets/json/stepFieldsSelo.json'; // json структура шагов и их полей для Села
+  import stepFieldsCityFrame from '@/assets/json/stepFieldsCity.json'; // json структура шагов и их полей для Села
   
   @Component({
     name: 'main-page',
@@ -75,7 +85,13 @@
       'c-create-doc-modal': CCreateDocModal
     }
   })
-  export default class MainPage extends Vue {
+  export default class CNasPunkt extends Vue {
+    @Prop({
+        required: true,
+        default: true
+    })
+    private readonly isVillage!: boolean;
+
     private indxStep = 0;
     private stepLst: any[] = [];
 
@@ -83,6 +99,7 @@
 
     private documentLst: any[] = []; // список документов
     private curDocument: null | any = null // выбранный документ
+    private curDocId: null | any = null;
 
     private editMode = false;
 
@@ -105,11 +122,23 @@
       this.$watch('curDocument', () => {
         this.loadDocument();
       })
+
+      this.$watch('curDocId', () => {
+        this.curDocument = null;
+        for (let i=0; i< this.documentLst.length; i++) {
+          if (this.curDocId === this.documentLst[i].id) {
+            this.curDocument = this.documentLst[i];
+            break;
+          }
+        }
+        console.log('curDocument', this.curDocument);
+      });
     }
 
     // установить текущую структуру для шагов
     private async setStepFrame() {
-      const curStepLst: any = JSON.parse(JSON.stringify(stepFieldsSeloFrame)); // ----!!! будет выбор json для села или города (сейчас только село)
+      let curStepLst: any = JSON.parse(JSON.stringify(stepFieldsSeloFrame));
+      if (!this.isVillage) { curStepLst = JSON.parse(JSON.stringify(stepFieldsCityFrame)); }  
       /*for (const el of curStepLst) {
         const fieldsMap = new Map(Object.entries(el.fields));
         el.fields = fieldsMap;
@@ -134,7 +163,9 @@
       await this.setStepFrame();
       // ----
       try {
-        const response = await fetch(`http://85.159.27.162:85/api/SeloForms/GetSeloFormsByDocId?idDoc=${encodeURI(this.curDocument.id)}`, {
+        let url = 'http://85.159.27.162:85/api/SeloForms/GetSeloFormsByDocId?idDoc='
+        if (!this.isVillage) { url = 'http://85.159.27.162:85/api/CityForms/GetSeloFormsByDocId?idDoc='; } // город
+        const response = await fetch(url + encodeURI(this.curDocument.id), {
             method: 'GET',
         });
         
@@ -176,7 +207,9 @@
         return;
       }
       try {
-        const response = await fetch(`http://85.159.27.162:85/api/SeloForms/GetSeloDocument?katoKod=${encodeURI(this.curKato.code)}`, {
+        let url = 'http://85.159.27.162:85/api/SeloForms/GetSeloDocument?katoKod=';
+        if (!this.isVillage) { url = 'http://85.159.27.162:85/api/CityForms/GetCityDocument?katoKod='; } // город
+        const response = await fetch(url + encodeURI(this.curKato.code), {
             method: 'GET',
         });
         
@@ -188,13 +221,13 @@
         for (const el of data) {
           el.name = `${el.year} год`
         }
-        if (data.length) { this.curDocument = data[0]; }
-        if (data.length) { 
+        /*if (data.length) { 
           this.curDocument = data[0];
         } else {
           this.curDocument = null;
-        }
+        }*/
         this.documentLst = data;
+        console.log('documentLst', this.documentLst);
       } catch (error) {
         console.error('Error GetSeloDocument:', error);
         this.progress = 0;
@@ -253,14 +286,16 @@
     // добавить форму
     private async addForm() {
       if (!this.curDocument) { return; }
-      const obj = [
+      let obj: { documentId: string, obshKolSelNasPun?: number }[]= [
         { 
           "documentId": this.curDocument.id, 
           "obshKolSelNasPun": 1 
         }
-      ]
+      ];
+      if (!this.isVillage) { obj = [{ "documentId": this.curDocument.id }]; } // город
       try {
-          const url = `http://85.159.27.162:85/api/SeloForms/AddSeloForms?idDoc=${this.curDocument.id}`;
+          let url = `http://85.159.27.162:85/api/SeloForms/AddSeloForms?idDoc=${this.curDocument.id}`;
+          if (!this.isVillage) { url = `http://85.159.27.162:85/api/CityForms/AddCityForms?idDoc=${this.curDocument.id}`; }
           let response: any = await fetch(url, {
               method: 'POST',
               mode: 'cors',
@@ -279,7 +314,8 @@
           }
           response = await response.json();
           console.log('addForm', response);
-          this.loadDocument();
+          await this.loadDocument();
+          this.editMode = true;
       } catch (error) {
         console.error('Error addForm:', error);
       }
@@ -308,7 +344,8 @@
       console.log('saveArr', saveArr, id);
       let okFl = false;
       try {
-          const url = `http://85.159.27.162:85/api/SeloForms/${id}`;
+          let url = `http://85.159.27.162:85/api/SeloForms/${id}`;
+          if (!this.isVillage) { url = `http://85.159.27.162:85/api/CityForms/${id}`; }
           let response: any = await fetch(url, {
               method: 'PATCH',
               mode: 'cors',

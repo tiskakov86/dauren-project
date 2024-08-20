@@ -1,19 +1,20 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import MainPage from '../components/mainPage.vue'
+import CVillage from '../components/cVillage.vue'
+import CCity from '../components/cCity.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/main',
-    name: 'main',
-    component: MainPage
+    path: '/village',
+    name: 'village',
+    component: CVillage
   },
   {
-    path: '/about',
-    name: 'about',
-    component: () => import( '../views/AboutView.vue')
+    path: '/city',
+    name: 'city',
+    component: CCity
   }
 ]
 

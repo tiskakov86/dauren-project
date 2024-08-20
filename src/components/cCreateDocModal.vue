@@ -22,6 +22,12 @@
   export default class CCreateDocModal extends Vue {
     @Prop({
         required: true,
+        default: true
+    })
+    private isVillage!: boolean;
+
+    @Prop({
+        required: true,
         default: null
     })
     private curKato!: any | null;
@@ -66,7 +72,8 @@
         }
         console.log('--obj', obj);
         try {
-            const url = 'http://85.159.27.162:85/api/SeloForms/AddSeloDocument';
+            let url = 'http://85.159.27.162:85/api/SeloForms/AddSeloDocument';
+            if (!this.isVillage) { url = 'http://85.159.27.162:85/api/CityForms/AddCityDocument'; }
             let response: any = await fetch(url, {
                 method: 'POST',
                 mode: 'cors',

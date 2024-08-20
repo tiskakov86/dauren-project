@@ -57,7 +57,7 @@
         <template #modal-footer>
             <div class="buttons">
                 <b-button class="btn-button"  variant="light" @click="showModal = false">Закрыть</b-button>
-                <b-button class="btn-button" variant="success" :disabled="!curKato" @click="clkSelect">Выбрать</b-button>
+                <b-button class="btn-button" variant="success" :disabled="!saveEnable" @click="clkSelect">Выбрать</b-button>
             </div>
         </template>
     </b-modal>
@@ -66,12 +66,18 @@
 
    
   <script lang="ts">
-  import { Component, Vue} from 'vue-property-decorator';
+  import { Component, Vue, Prop} from 'vue-property-decorator';
   
   @Component({
     name: 'c-kato-modal'
   })
   export default class CKatoModal extends Vue {
+    @Prop({
+        required: true,
+        default: true
+    })
+    private isVillage!: boolean;
+
     private showModal = false;
 
     private curKato: any | null = null;
@@ -89,6 +95,8 @@
     // -- село
     private villageLst: any[] = [];
     private curVillage: any | null = null;
+
+    private saveEnable = false;
 
     private showEvent() {
         this.showModal = true;
@@ -135,6 +143,11 @@
         if (this.curRegion && this.curRegion.isReportable) { curKato = this.curRegion; }
         if (this.curSettlement && this.curSettlement.isReportable) { curKato = this.curSettlement; }
         if (this.curVillage && this.curVillage.isReportable) { curKato = this.curVillage; }
+        this.saveEnable = false;
+        if (curKato) {
+            if (this.isVillage && curKato.katoLevel === 2) { this.saveEnable = true; }
+            if (!this.isVillage && curKato.katoLevel === 1) { this.saveEnable = true; }
+        }
         this.curKato = curKato;
     }
 
@@ -209,6 +222,13 @@
 
     private clkSelect() {
         this.setCurKato();
+        if (this.isVillage && this.curKato.katoLevel !== 2) { 
+            alert('Выбран не верный тип населённого пункта!');
+            return;
+        } else if(!this.isVillage && this.curKato.katoLevel !== 1){
+            alert('Выберите город!');
+            return;
+         }
         this.$emit('selectKato', this.curKato);
         this.showModal = false;
     }
