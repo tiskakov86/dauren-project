@@ -294,8 +294,9 @@
       ];
       if (!this.isVillage) { obj = [{ "documentId": this.curDocument.id }]; } // город
       try {
-          let url = `http://85.159.27.162:85/api/SeloForms/AddSeloForms?idDoc=${this.curDocument.id}`;
-          if (!this.isVillage) { url = `http://85.159.27.162:85/api/CityForms/AddCityForms?idDoc=${this.curDocument.id}`; }
+
+          let url = `http://85.159.27.162:85/api/SeloForms/AddSeloForms?login=${this.login}`;
+          if (!this.isVillage) { url = `http://85.159.27.162:85/api/CityForms/AddCityForms?login=${this.login}`; }
           let response: any = await fetch(url, {
               method: 'POST',
               mode: 'cors',
