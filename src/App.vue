@@ -32,22 +32,18 @@ import { mapGetters, mapActions } from 'vuex';
     }
   },
   methods: {
-    ...mapActions(['logout']),
-    async handleLogout() {
-      try {
-        await this.logout();
-        this.$router.push('/login');
-      } catch (error) {
-        console.error('Logout failed:', error);
-      }
-    }
+    ...mapActions(['logout'])
   }
 })
 export default class App extends Vue {
-  // Данные и методы для отображения информации о пользователе и выхода
+  logout!: () => Promise<void>;
+    async handleLogout() {
+    try {
+      await this.logout();  // TypeScript теперь знает, что этот метод существует
+      this.$router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }
 }
 </script>
-
-<style>
-/* Ваши стили */
-</style>

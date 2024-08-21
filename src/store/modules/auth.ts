@@ -1,6 +1,5 @@
 import { Module } from 'vuex';
 import { State } from '../../store';
-import {makeToast, getErrorText} from '@/assets/js/some-funct';
 
 interface AuthState {
   token: string | null;
@@ -54,16 +53,14 @@ const auth: Module<AuthState, State> = {
         });
 
         if (!response.ok) {
-          const errTxt = await getErrorText(response);
-          throw new Error(errTxt);
+          throw new Error('Login request failed');
         }
 
         const data = await response.json();
         commit('setToken', data.token);
         commit('setUser', { username: login });
       } catch (error) {
-        makeToast(this, 'danger', 'Error Login', (error as Error).toString());
-        console.error('Error Login:', error);
+        console.error('Error during login:', error);
       }
     },
     logout({ commit }) {
