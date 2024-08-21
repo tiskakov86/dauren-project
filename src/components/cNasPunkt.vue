@@ -28,7 +28,7 @@
             </div> -->
             
             <div class="d-inline-block p-2">
-              <b-button class="btn-button" variant="success" @click="addDocClk" :disabled="!curKato">Создать документ <span v-if="isVillage"> по селу</span><span v-else> по городу</span></b-button>
+              <b-button class="btn-button" variant="primary" @click="addDocClk" :disabled="!curKato">Создать документ <span v-if="isVillage"> по селу</span><span v-else> по городу</span></b-button>
             </div>
             
             <b-form-select value-field="id" text-field="name"  v-model="curDocId" :options="documentLst" :select-size="4" :disabled="!saveDisabled"></b-form-select>
@@ -47,7 +47,7 @@
                 <b-button class="btn-button" variant="light" @click="cancelSaveClk" v-if="!saveDisabled">Отменить</b-button>
               </div>
               <div class="d-inline-block p-2">
-                <b-button class="btn-button" variant="success" @click="addForm" :disabled="!saveDisabled">Добавить данные (строку)</b-button>
+                <b-button class="btn-button" variant="primary" @click="addForm" :disabled="!saveDisabled">Добавить данные (строку)</b-button>
               </div>
             </div>
         </div>

@@ -1,61 +1,63 @@
 <template>
   <div class="user-management">
     <h1>Управление пользователями</h1>
+    <div class="table-container">
+      <table class="table b-table table-bordered b-table-no-border-collapse">
+        <thead>
+          <tr>
+            <th>Логин</th>
+            <th>Kato Code</th>
+            <th>Роли</th>
+            <th>Email</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="user.login === 'тест-0-0-тест'">
+            <td v-if="!user.isEditing">{{ user.login }}</td>
+            <td v-else>
+              <b-input v-model="user.login" disabled />
+            </td> 
 
-    <table>
-      <thead>
-        <tr>
-          <th>Логин</th>
-          <th>Kato Code</th>
-          <th>Роли</th>
-          <th>Email</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="user.login === 'тест-0-0-тест'">
-          <td v-if="!user.isEditing">{{ user.login }}</td>
-          <td v-else>
-            <input v-model="user.login" disabled />
-          </td>
+            <td v-if="!user.isEditing">{{ user.katoCode }}</td>
+            <td v-else>
+              <b-input v-model="user.katoCode" type="number" />
+            </td>
 
-          <td v-if="!user.isEditing">{{ user.katoCode }}</td>
-          <td v-else>
-            <input v-model="user.katoCode" type="number" />
-          </td>
+            <td v-if="!user.isEditing">{{ user.roles.join(', ') }}</td>
+            <td v-else>
+              <b-input v-model="user.roles" placeholder="Роли" />
+            </td>
 
-          <td v-if="!user.isEditing">{{ user.roles.join(', ') }}</td>
-          <td v-else>
-            <input v-model="user.roles" placeholder="Роли" />
-          </td>
+            <td v-if="!user.isEditing">{{ user.email }}</td>
+            <td v-else>
+              <b-input v-model="user.email" type="email" />
+            </td>
 
-          <td v-if="!user.isEditing">{{ user.email }}</td>
-          <td v-else>
-            <input v-model="user.email" type="email" />
-          </td>
-
-          <td v-if="!user.isEditing">
-            <button @click="editUser">Редактировать</button>
-          </td>
-          <td v-else>
-            <button @click="saveUser">Сохранить</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td v-if="!user.isEditing">
+              <b-button class="btn-button" variant="primary" @click="editUser">Редактировать</b-button>
+            </td>
+            <td v-else>
+              <b-button class="btn-button" variant="success" @click="saveUser">Сохранить</b-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div v-if="user.isEditing" class="password-modal">
       <h3>Введите новый пароль</h3>
-      <input v-model="newPassword" type="password" placeholder="Новый пароль" />
-      <input v-model="confirmPassword" type="password" placeholder="Подтвердите пароль" />
-      <button @click="savePassword">Сохранить пароль</button>
-      <button @click="cancelEdit">Отмена</button>
+      <b-input v-model="newPassword" type="password" placeholder="Новый пароль" />
+      <b-input v-model="confirmPassword" type="password" placeholder="Подтвердите пароль" />
+      <b-button class="btn-button" variant="success" @click="savePassword">Сохранить пароль</b-button>
+      <b-button class="btn-button" variant="light" @click="cancelEdit">Отмена</b-button>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import '@/assets/css/b-table.css';
 
 export default {
   name: 'UserManagement',

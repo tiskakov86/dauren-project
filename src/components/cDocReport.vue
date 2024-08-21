@@ -36,25 +36,11 @@
     </div>
 </template>
 
-<style scoped>
-.table-container .table thead tr th {
-    background-color: #f7f9fc !important;
-    text-transform: uppercase;
-    color: #6087a0 !important;
-    
-    font-weight: 800;
-    line-height: 1.3;
-    padding: 5px 8px;
-}
-
-.table-container .table th, .table td {
-    padding: 0.4rem!important;
-}
-</style>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import '@/assets/css/step-file.css'
+import '@/assets/css/step-file.css';
+import '@/assets/css/b-table.css';
 
 @Component({
   name: 'c-doc-report',
