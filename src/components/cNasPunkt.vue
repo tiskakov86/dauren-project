@@ -73,6 +73,7 @@
   
   <script lang="ts">
   import { Component, Vue, Prop } from 'vue-property-decorator';
+  import {makeToast, getErrorText} from '@/assets/js/some-funct';
   import CStep from '@/components/cStep.vue';
   import CDocReport from '@/components/cDocReport.vue';
   import CKatoModal from '@/components/cKatoModal.vue';
@@ -183,7 +184,8 @@
         });
         
         if (!response.ok) {
-            throw new Error('loadDocument response was not ok');
+          const errTxt = await getErrorText(response);
+          throw new Error(errTxt);
         }
         const data = await response.json();
         data.sort((a: any, b: any) => (a.id > b.id) ? 1 : -1);
@@ -193,8 +195,9 @@
         // this.documetnDataNew = JSON.parse(JSON.stringify(data));
         this.progress = 100;
       } catch (error) {
-        console.error('Error loadDocument:', error);
         this.progress = 0;
+        makeToast(this, 'danger', 'Error loadDocument', (error as Error).toString());
+        console.error('Error loadDocument:', error);
       }
     }
 
@@ -227,7 +230,8 @@
         });
         
         if (!response.ok) {
-            throw new Error('GetSeloDocument response was not ok');
+          const errTxt = await getErrorText(response);
+          throw new Error(errTxt);
         }
         const data = await response.json();
         data.sort((a: any, b: any) => (a.year < b.year) ? 1 : -1);
@@ -241,8 +245,9 @@
         }*/
         this.documentLst = data;
       } catch (error) {
-        console.error('Error GetSeloDocument:', error);
         this.progress = 0;
+        makeToast(this, 'danger', 'Error GetSeloDocument', (error as Error).toString());
+        console.error('Error GetSeloDocument:', error);
       }
     }
 
@@ -292,12 +297,14 @@
               body: JSON.stringify(obj)
           });
           if (!response.ok) {
-            throw new Error('addForm response was not ok');
+            const errTxt = await getErrorText(response);
+            throw new Error(errTxt);
           }
           response = await response.json();
           await this.loadDocument();
           this.editMode = true;
       } catch (error) {
+        makeToast(this, 'danger', 'Error addForm', (error as Error).toString());
         console.error('Error addForm:', error);
       }
     }
@@ -340,13 +347,15 @@
               body: JSON.stringify(saveArr)
           });
           if (!response.ok) {
-            throw new Error('saveData response was not ok');
+            const errTxt = await getErrorText(response);
+            throw new Error(errTxt);
           } else {
             okFl = true;
           }
           response = await response.json();
           console.log('response saveData', response);
       } catch (error) {
+        makeToast(this, 'danger', 'Error saveData', (error as Error).toString());
         console.error('Error saveData:', error);
       } finally {
         return okFl;

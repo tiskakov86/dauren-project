@@ -15,6 +15,7 @@
    
   <script lang="ts">
   import { Component, Vue, Prop} from 'vue-property-decorator';
+  import {makeToast, getErrorText} from '@/assets/js/some-funct';
   
   @Component({
     name: 'c-create-doc-modal'
@@ -87,12 +88,15 @@
                 referrerPolicy: 'no-referrer', 
                 body: JSON.stringify(obj)
             });
+            
             if (!response.ok) {
-              throw new Error('createDocument response was not ok');
+                const errTxt = await getErrorText(response);
+                throw new Error(errTxt);
             }
             response = await response.json();
         } catch (error) {
-          console.error('Error createDocument:', error);
+            makeToast(this, 'danger', 'Error createDocument', (error as Error).toString());
+            console.error('Error createDocument:', error);
         } finally {
             this.showModal = false;
             this.$emit('created', this.curYear);

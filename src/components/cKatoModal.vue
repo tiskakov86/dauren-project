@@ -67,6 +67,7 @@
    
   <script lang="ts">
   import { Component, Vue, Prop} from 'vue-property-decorator';
+  import {makeToast, getErrorText} from '@/assets/js/some-funct';
   
   @Component({
     name: 'c-kato-modal'
@@ -208,13 +209,15 @@
             });
             
             if (!response.ok) {
-                throw new Error('loadKato response was not ok');
+                const errTxt = await getErrorText(response);
+                throw new Error(errTxt);
             }
             const data = await response.json();
             result = data;
         } catch (error) {
-            console.error('Error loadKato:', error);
             result = [];
+            makeToast(this, 'danger', 'Error loadKato', (error as Error).toString());
+            console.error('Error loadKato:', error);
         } finally {
             return result;
         }
