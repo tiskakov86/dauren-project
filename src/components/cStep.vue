@@ -1,12 +1,12 @@
 <template>
     <div>
       <div v-for="(formEl, formIndx) of formData" :key="`formIndx${formIndx}`">
-        <div class="button-with-text">
+        <div class="circle-button-with-text">
           <b-button @click="formEl.isExpanded=!formEl.isExpanded" class="circle-button">
-            <i :class="!formEl.isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="icon-color"></i>
+            <i :class="!formEl.isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="circle-icon-color"></i>
           </b-button>
-          <!-- <span class="button-text">{{ formEl.obslPredpId }}</span> -->
-          <span class="button-text">{{ formEl.id }}</span>
+          <!-- <span class="circle-button-text">{{ formEl.obslPredpId }}</span> -->
+          <span class="circle-button-text">{{ formEl.id }}</span>
         </div>
         <b-collapse v-model="formEl.isExpanded">
           <b-card>
@@ -31,44 +31,12 @@
         <!-- <b-card-text>{{ `Компонент шаг ${step.id}!!!!` }}</b-card-text> -->
       </div>
   </div>
-  </template>
-  <style scoped>
-
-    .button-with-text {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
-    .circle-button {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: transparent;
-      border: 1px solid #000; /* Обозначаем границы */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      margin-right: 10px; /* Отступ между кнопкой и текстом */
-    }
-
-    .circle-button:hover .icon-color {
-      color: #007bff; /* Цвет при наведении */
-    }
-
-    .icon-color {
-      color: black; /* Задайте цвет иконки */
-    }
-
-    .button-text {
-      font-size: 16px; /* Размер шрифта для текста */
-      color: #000; /* Цвет текста */
-    }
-  </style> 
+  </template> 
    
   <script lang="ts">
   import { Component, Vue, Prop } from 'vue-property-decorator';
   import CNumberInput from '@/components/cNumberInput.vue';
+  import '@/assets/css/step-file.css'
   
   @Component({
     name: 'c-step',
@@ -89,15 +57,14 @@
     })
     private edited!: boolean;
 
-    private formData: any[] = []; // список форм (для редактирования)
-
     @Prop({
         required: true,
         default: null
     })
     private documentData!: any[] | null;
 
-    private inputArr = [1, 2, 3, 4, 5, 6];
+    private formData: any[] = []; // список форм (для редактирования)
+
 
     private mounted() {
       this.getForm();
@@ -109,8 +76,6 @@
     private getForm() {
       this.formData = [];
       if (this.documentData === null) { return; }
-      console.log('stepFrame', JSON.parse(JSON.stringify(this.stepFrame)));
-      console.log('documentData', JSON.parse(JSON.stringify(this.documentData)));
       for (const elDoc of this.documentData) {
         const obj: any = {};
         for (const fieldKey in this.stepFrame.fields) {
@@ -119,13 +84,11 @@
         }
         this.formData.push({obslPredpId: elDoc.obslPredpId, fields: obj, isExpanded: true, id: elDoc.id });
       }
-      console.log('formData', this.formData);
     }
 
     private changeData(formIndx: number, key: string, value: any) {
-      console.log('changeData called with:', { formIndx, key, value });
       if (!value || !value.hasOwnProperty('val')) {
-        console.log('Invalid value object:', value);
+        console.error('Invalid value object:', value);
         return;
       }
       this.$emit('change', {formIndx: formIndx, key: key, value: value});

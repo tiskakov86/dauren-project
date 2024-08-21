@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import extend from 'extend';
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import App from './App.vue';
+import store from './store';
+import router from './router';
 
 import BootstrapVue from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
@@ -34,7 +34,7 @@ Vue.component('multiselect', Multiselect);
 // };
 
 new Vue({
-  router,
   store,
+  router,
   render: h => h(App)
 }).$mount('#app');

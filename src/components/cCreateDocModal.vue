@@ -38,11 +38,12 @@
     })
     private login!: string | null;
 
-    @Prop({
-        required: true,
-        default: null
-    })
-    private token!: string | null;
+    private get token(): string | null {
+      if (this.$store.state.auth.token) {
+        return this.$store.state.auth.token;
+      }
+      return null;
+    }
 
     private showModal = false;
 
@@ -70,7 +71,6 @@
             "login": this.login,
             "year": this.curYear
         }
-        console.log('--obj', obj);
         try {
             let url = 'http://85.159.27.162:85/api/SeloForms/AddSeloDocument';
             if (!this.isVillage) { url = 'http://85.159.27.162:85/api/CityForms/AddCityDocument'; }
@@ -91,7 +91,6 @@
               throw new Error('createDocument response was not ok');
             }
             response = await response.json();
-            console.log('createDocument', response);
         } catch (error) {
           console.error('Error createDocument:', error);
         } finally {
