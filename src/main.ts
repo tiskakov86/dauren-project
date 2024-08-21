@@ -12,7 +12,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
-//import '@/assets/scss/style.scss';
 
 
 Vue.use(BootstrapVue);

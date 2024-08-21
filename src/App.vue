@@ -3,7 +3,10 @@
     <b-navbar v-if="!isLoginPage" type="dark" variant="dark">
       <b-navbar-brand href="/village">Село</b-navbar-brand>
       <b-navbar-brand href="/city">Город</b-navbar-brand>
-
+      <b-navbar-brand href="/references">Справочники</b-navbar-brand>
+      <b-navbar-brand href="/referenceKato">Като</b-navbar-brand>
+      <b-navbar-brand href="/users">Пользователи</b-navbar-brand>
+      <b-navbar-brand href="/maps">Карта</b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown v-if="isAuthenticated" right>
           <template #button-content>

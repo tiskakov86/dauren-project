@@ -16,6 +16,7 @@
     "bootstrap-icons": "^1.11.3",
     "bootstrap-vue": "^2.21.2",
     "extend": "^3.0.2",
+    "leaflet": "^1.9.4",
     "tslib": "^2.6.3",
     "vue": "^2.6.14",
     "vue-class-component": "^7.2.3",

@@ -24,7 +24,27 @@ const routes: Array<RouteConfig> = [
     path: '/login',
     name: 'login',
     component: cLogin
-  }
+  },
+  {
+    path: '/references',
+    name: 'references',
+    component: () => import( '../views/References.vue')
+  },
+  {
+    path: '/referenceKato',
+    name: 'referenceKato',
+    component: () => import( '../views/ReferenceKato.vue')
+  },
+  {
+    path: '/users',
+    name: 'users',
+    component: () => import( '../views/Users.vue')
+  },
+  {
+    path: '/maps',
+    name: 'maps',
+    component: () => import( '../views/MapView.vue')
+  } 
 ]
 
 const router = new VueRouter({
