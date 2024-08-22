@@ -13,18 +13,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="user.login === 'тест-0-0-тест'">
+          <tr v-for="user in users" :key="user.id">
             <td v-if="!user.isEditing">{{ user.login }}</td>
             <td v-else>
               <b-input v-model="user.login" disabled />
-            </td> 
+            </td>
 
             <td v-if="!user.isEditing">{{ user.katoCode }}</td>
             <td v-else>
               <b-input v-model="user.katoCode" type="number" />
             </td>
 
-            <td v-if="!user.isEditing">{{ user.roles.join(', ') }}</td>
+            <td v-if="!user.isEditing">{{ user.roles.map(role => role.roleId).join(', ') }}</td>
             <td v-else>
               <b-input v-model="user.roles" placeholder="Роли" />
             </td>
@@ -35,17 +35,17 @@
             </td>
 
             <td v-if="!user.isEditing">
-              <b-button class="btn-button" variant="primary" @click="editUser">Редактировать</b-button>
+              <b-button class="btn-button" variant="primary" @click="editUser(user)">Редактировать</b-button>
             </td>
             <td v-else>
-              <b-button class="btn-button" variant="success" @click="saveUser">Сохранить</b-button>
+              <b-button class="btn-button" variant="success" @click="saveUser(user)">Сохранить</b-button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div v-if="user.isEditing" class="password-modal">
+    <div v-if="editedUser" class="password-modal">
       <h3>Введите новый пароль</h3>
       <b-input v-model="newPassword" type="password" placeholder="Новый пароль" />
       <b-input v-model="confirmPassword" type="password" placeholder="Подтвердите пароль" />
@@ -55,62 +55,91 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
 import axios from 'axios';
-import '@/assets/css/b-table.css';
 
-export default {
-  name: 'UserManagement',
-  data() {
-    return {
-      user: {
-        login: 'тест-0-0-тест',
-        katoCode: 12345,
-        roles: [0],
-        email: 'user@example.com',
-        isEditing: false,
-      },
-      newPassword: '',
-      confirmPassword: '',
-    };
-  },
-  methods: {
-    editUser() {
-      this.user.isEditing = true;
-    },
-    async saveUser() {
-      if (this.newPassword !== this.confirmPassword) {
-        alert('Пароли не совпадают!');
-        return;
-      }
-      try {
-        const payload = {
-          login: this.user.login,
-          katoCode: this.user.katoCode,
-          roles: this.user.roles,
-          email: this.user.email,
-          password: this.newPassword || 'string', // Если пароль не указан, передаем старый пароль
-        };
-        await axios.post('http://85.159.27.162:85/api/Account/SignUp', payload);
-        this.user.isEditing = false;
-        this.clearPasswordFields();
-      } catch (error) {
-        console.error('Ошибка при сохранении пользователя:', error);
-      }
-    },
-    savePassword() {
-      this.saveUser();
-    },
-    cancelEdit() {
-      this.user.isEditing = false;
+@Component
+export default class UserManagement extends Vue {
+  users: Array<any> = [];
+  editedUser: any = null;
+  newPassword: string = '';
+  confirmPassword: string = '';
+
+  // Получение токена из хранилища Vuex
+  private get token(): string | null {
+    return this.$store.state.auth.token || null;
+  }
+
+  async created() {
+    await this.fetchUsers();
+  }
+
+  async fetchUsers() {
+    try {
+      const response = await axios.post(
+        'http://85.159.27.162:85/api/Account/list',
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+          },
+        }
+      );
+      this.users = response.data;
+    } catch (error) {
+      console.error('Ошибка при загрузке данных пользователей:', error);
+    }
+  }
+
+  editUser(user: any) {
+    user.isEditing = true;
+    this.editedUser = user;
+  }
+
+  async saveUser(user: any) {
+    if (this.newPassword && this.newPassword !== this.confirmPassword) {
+      alert('Пароли не совпадают!');
+      return;
+    }
+    try {
+      const payload = {
+        login: user.login,
+        katoCode: user.katoCode,
+        roles: user.roles.map((role: any) => ({ roleId: role.roleId })),
+        email: user.email,
+        password: this.newPassword || 'string',
+      };
+      await axios.post('http://85.159.27.162:85/api/Account/SignUp', payload, {
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+        },
+      });
+      user.isEditing = false;
       this.clearPasswordFields();
-    },
-    clearPasswordFields() {
-      this.newPassword = '';
-      this.confirmPassword = '';
-    },
-  },
-};
+      this.editedUser = null;
+    } catch (error) {
+      console.error('Ошибка при сохранении пользователя:', error);
+    }
+  }
+
+  savePassword() {
+    this.saveUser(this.editedUser);
+  }
+
+  cancelEdit() {
+    if (this.editedUser) {
+      this.editedUser.isEditing = false;
+    }
+    this.clearPasswordFields();
+    this.editedUser = null;
+  }
+
+  clearPasswordFields() {
+    this.newPassword = '';
+    this.confirmPassword = '';
+  }
+}
 </script>
 
 <style scoped>
